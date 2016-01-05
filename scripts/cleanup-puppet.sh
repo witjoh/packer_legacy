@@ -21,7 +21,7 @@ case "${PACKER_BUILDER_TYPE}" in amazon-*)
 esac
 
 # Remove other Puppet-related files and directories
-rm -rf /opt/puppet
+rm -rf /opt/puppet /opt/puppetlabs /opt/puppet-agent
 rm -rf /var/cache/yum/puppetdeps
 rm -rf /var/opt/lib/pe-puppet
 rm -rf /var/opt/puppetlabs
