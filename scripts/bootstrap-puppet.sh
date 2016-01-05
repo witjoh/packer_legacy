@@ -57,13 +57,16 @@ else
   exit 1
 fi
 
+PATH=/opt/puppetlabs/bin:/opt/puppet/bin:"$PATH"
+MODULEPATH=/tmp/packer-puppet-masterless/manifests/modules
+
 # Show Puppet version
-printf 'Puppet ' ; /opt/puppet/bin/puppet --version
+printf 'Puppet ' ; puppet --version
 
 # Installed required modules
 for i in "$@"
 do
-  /opt/puppet/bin/puppet module install $i --modulepath=/tmp/packer-puppet-masterless/manifests/modules >/dev/null 2>&1
+  puppet module install $i --modulepath=$MODULEPATH >/dev/null 2>&1
 done
 
-printf 'Modules installed in ' ; /opt/puppet/bin/puppet module list --modulepath=/tmp/packer-puppet-masterless/manifests/modules
+printf 'Modules installed in ' ; puppet module list --modulepath=$MODULEPATH
