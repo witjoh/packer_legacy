@@ -14,7 +14,8 @@
 
       "provisioner": "vmware",
       "required_modules": "puppetlabs-stdlib saz-ssh",
-      "puppet_nfs": "{{env `PUPPET_NFS`}}"
+      "puppet_nfs": "{{env `PUPPET_NFS`}}",
+      "master_install_url" : "{{env `MASTER_INSTALL_URL`}}"
     },
 
   "builders": [
@@ -60,7 +61,8 @@
       "execute_command": "{{.Vars}} sh '{{.Path}}' {{user `required_modules`}}",
       "environment_vars": [
         "TEMPLATE={{user `template_name`}}",
-        "PUPPET_NFS={{user `puppet_nfs`}}"
+        "PUPPET_NFS={{user `puppet_nfs`}}",
+        "MASTER_INSTALL_URL={{user `master_install_url`}}"
       ],
       "scripts": [
         "../../scripts/bootstrap-puppet.sh"

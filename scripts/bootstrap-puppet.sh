@@ -49,8 +49,11 @@ EOF
   tar -xzvf pe.tar.gz
   cd `ls -d puppet*`
   ./puppet-enterprise-installer -a /tmp/answers
+elif [ -n "${MASTER_INSTALL_URL}" ]; then
+  echo "Installing PE from installer on master..."
+  wget --no-check-certificate "${MASTER_INSTALL_URL}" -O- | bash
 else
-  echo "The environment variables PUPPET_NFS or PE_URL must be provided to provision PE." >&2
+  echo "The environment variables PUPPET_NFS, PE_URL, or MASTER_INSTALL_URL must be provided to provision PE." >&2
   exit 1
 fi
 
