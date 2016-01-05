@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [[ "${TEMPLATE}" == "fedora-22"* ]]; then
+case "${TEMPLATE}" in fedora-22*)
   echo "Updating rpcbind..."
   dnf -y upgrade rpcbind
   systemctl enable rpcbind.socket
   systemctl restart rpcbind.service
-fi
+esac
 
 
 if [ -n "${PUPPET_NFS}" ]; then
