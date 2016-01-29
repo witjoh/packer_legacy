@@ -1,0 +1,79 @@
+{
+
+  "variables":
+    {
+      "template_name": "debian-8.2-x64-puppet",
+      "version": "1",
+
+      "provisioner": "vmware",
+      "master_install_url" : "{{env `MASTER_INSTALL_URL`}}",
+      "autosign" : "{{env `AUTOSIGN`}}",
+      "template_hostname" : "{{env `TEMPLATE_HOSTNAME`}}",
+
+      "packer_vcenter_host": "{{env `PACKER_VCENTER_HOST`}}",
+      "packer_vcenter_username": "{{env `PACKER_VCENTER_USERNAME`}}",
+      "packer_vcenter_password": "{{env `PACKER_VCENTER_PASSWORD`}}",
+      "packer_vcenter_dc": "{{env `PACKER_VCENTER_DC`}}",
+      "packer_vcenter_cluster": "{{env `PACKER_VCENTER_CLUSTER`}}",
+      "packer_vcenter_datastore": "{{env `PACKER_VCENTER_DATASTORE`}}",
+      "packer_vcenter_folder": "{{env `PACKER_VCENTER_FOLDER`}}",
+      "packer_vcenter_net": "{{env `PACKER_VCENTER_NET`}}",
+      "packer_vcenter_insecure": "{{env `PACKER_VCENTER_INSECURE`}}",
+
+      "memory_size": "512",
+      "cpu_count": "1"
+
+    },
+
+  "builders": [
+    {
+      "name": "{{user `template_name`}}-{{user `provisioner`}}-vsphere-nocm",
+      "vm_name": "packer-{{build_name}}",
+      "type": "vmware-vmx",
+      "source_path": "output-{{user `template_name`}}-{{user `provisioner`}}/packer-{{user `template_name`}}-{{user `provisioner`}}.vmx",
+      "ssh_username": "root",
+      "ssh_password": "puppet",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "/sbin/halt -h -p",
+      "headless": true,
+      "vmx_data_post": {
+        "memsize": "{{user `memory_size`}}",
+        "numvcpus": "{{user `cpu_count`}}",
+        "cpuid.coresPerSocket": "1"
+      }
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+        "MASTER_INSTALL_URL={{user `master_install_url`}}",
+        "AUTOSIGN={{user `autosign`}}",
+        "TEMPLATE_HOSTNAME={{user `template_hostname`}}"
+      ],
+      "scripts": [
+        "../../scripts/bootstrap-puppet-agent.sh"
+        "../../scripts/cleanup-scrub.sh"
+      ]
+    }
+  ],
+
+  "post-processors": [
+    {
+      "type": "vsphere",
+      "host": "{{user `packer_vcenter_host`}}",
+      "username": "{{user `packer_vcenter_username`}}",
+      "password": "{{user `packer_vcenter_password`}}",
+      "datacenter": "{{user `packer_vcenter_dc`}}",
+      "cluster": "{{user `packer_vcenter_cluster`}}",
+      "datastore": "{{user `packer_vcenter_datastore`}}",
+      "vm_folder": "{{user `packer_vcenter_folder`}}",
+      "vm_name": "test-{{user `template_name`}}-{{user `version`}}",
+      "vm_network": "{{user `packer_vcenter_net`}}",
+      "disk_mode": "thin",
+      "insecure" : "{{user `packer_vcenter_insecure`}}"
+    }
+  ]
+}
