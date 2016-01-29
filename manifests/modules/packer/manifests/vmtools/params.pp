@@ -3,12 +3,12 @@ class packer::vmtools::params {
   case $::osfamily {
     'Redhat' : {
       $root_home = '/root'
-      $required_packages = [ 'kernel-devel', 'gcc' ]
+      $os_required_packages = [ 'kernel-devel', 'gcc' ]
     }
 
     'Debian' : {
       $root_home = '/root'
-      $required_packages = [ "linux-headers-${::kernelrelease}" ]
+      $os_required_packages = [ "linux-headers-${::kernelrelease}" ]
     }
 
     default : {
@@ -20,11 +20,12 @@ class packer::vmtools::params {
     virtualbox: {
       $tools_iso   = 'VBoxGuestAdditions.iso'
       $install_cmd = 'sh /tmp/vmtools/VBoxLinuxAdditions.run --nox11 ; true'
+      $required_packages = $os_required_packages
     }
 
     vmware: {
-      $tools_iso   = 'linux.iso'
-      $install_cmd = 'tar zxf /tmp/vmtools/VMwareTools-*.tar.gz -C /tmp/ ; /tmp/vmware-tools-distrib/vmware-install.pl --default ; rm -rf /tmp/vmware-tools-distrib'
+      # No ISO or install command.
+      $required_packages = $os_required_packages + [ 'open-vm-tools' ]
     }
 
     default: {
