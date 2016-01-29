@@ -3,7 +3,7 @@
   "variables":
     {
       "template_name": "debian-8.2-x86_64",
-      "template_os": "debian8-64",
+      "template_os": "otherlinux-64",
 
       "iso_url": "http://cdimage.debian.org/debian-cd/8.2.0/amd64/iso-cd/debian-8.2.0-amd64-CD-1.iso",
       "iso_checksum": "d3ac88ec064f9e941ee5d9cbfaa87ac48929b81471f96073305ccd7bd71ff521",
@@ -47,6 +47,7 @@
       "ssh_wait_timeout": "10000s",
       "shutdown_command": "/sbin/halt -h -p",
       "tools_upload_flavor": "linux",
+      "headless": true,
       "vmx_data": {
         "memsize": "{{user `memory_size`}}",
         "numvcpus": "{{user `cpu_count`}}",
@@ -62,7 +63,8 @@
       "environment_vars": [
         "TEMPLATE={{user `template_name`}}",
         "PUPPET_NFS={{user `puppet_nfs`}}",
-        "MASTER_INSTALL_URL={{user `master_install_url`}}"
+        "MASTER_INSTALL_URL={{user `master_install_url`}}",
+        "NOCM=1"
       ],
       "scripts": [
         "../../scripts/bootstrap-puppet.sh"
@@ -83,7 +85,8 @@
       "type": "shell",
       "environment_vars": [
         "TEMPLATE={{user `template_name`}}",
-        "PUPPET_NFS={{user `puppet_nfs`}}"
+        "PUPPET_NFS={{user `puppet_nfs`}}",
+        "NOCM=1"
       ],
       "scripts": [
         "../../scripts/cleanup-puppet.sh",

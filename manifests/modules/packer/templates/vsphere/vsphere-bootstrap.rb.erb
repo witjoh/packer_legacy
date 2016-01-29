@@ -1,0 +1,139 @@
+#!/usr/bin/ruby
+
+require 'rubygems'
+require 'rbvmomi'
+require 'socket'
+
+vcenter_account = {
+  :host     => '<%= @vsphere_host %>',
+  :user     => '<%= @vsphere_user %>',
+  :password => '<%= @vsphere_password %>',
+  :ssl      => true,
+  :insecure => <%= @vsphere_insecure_ssl ? 'true' : 'false' %>,
+  :rev      => '5.1'
+}
+
+def get_network_info
+  raw = %x{ip addr show scope global up}
+  if ! raw or raw == ""
+    raise "Could not get IP address: ip addr show scope global up"
+  end
+
+  data = {}
+  unless raw =~ /\s+link\/ether ([0-9a-fA-F:]+)/
+    raise "Could not get MAC address (link/ether): ip addr show scope global up"
+  end
+  data[:mac] = $1.downcase
+
+  unless raw =~ /\s+inet ([0-9.]+)/
+    raise "Could not get IP address (inet): ip addr show scope global up"
+  end
+  data[:ip] = $1
+
+  data
+rescue => e
+  puts "  #{e}"
+  nil
+end
+
+def try_until(initial_wait: 1, tries: 7, error: "ERROR: timed out")
+  wait = initial_wait
+
+  for try in 1..tries do
+    if yield(try)
+      return
+    end
+
+    puts "  Waiting #{wait} seconds and retrying."
+    sleep wait
+    wait *=2
+  end
+
+  puts error
+  exit 1
+end
+
+net = nil
+puts '- Getting IP and HW address...'
+try_until {
+  net = get_network_info()
+  ! net.nil?
+}
+puts "  IP: #{net[:ip]}"
+puts "  HW: #{net[:mac]}"
+puts ''
+puts '- Waiting for DNS resolution...'
+
+try_until {
+  begin
+    Socket.getaddrinfo(vcenter_account[:host], nil)
+    true
+  rescue
+    false
+  end
+}
+
+puts "- Connecting to #{vcenter_account[:host]} as #{vcenter_account[:user]}"
+
+vim = RbVmomi::VIM.connect(vcenter_account)
+
+puts '- Searching for myself by IP address...'
+
+hostname = ''
+try_until {
+  vms = vim.searchIndex.FindAllByIp(:vmSearch => true, :ip => net[:ip])
+  if vms.length > 0
+    puts '- Verifying network hardware (MAC) address...'
+
+    vms.each do |vm|
+      vm.macs.each_value do |found_mac|
+        if found_mac.downcase == net[:mac]
+          hostname = vm.name
+          break
+        end
+      end
+    end
+
+    if hostname == ''
+      puts "Verification failed."
+    end
+  end
+
+  hostname != ''
+}
+
+puts ''
+puts "Nice to meet you, my VM name is '#{hostname}'."
+puts ''
+
+puts '- Setting local hostname...'
+
+File.open('/etc/hostname', 'w') do |f|
+  f.write("#{hostname}\n")
+end
+
+Kernel.system('hostname -F /etc/hostname')
+
+### Not necessary on Debian
+if false
+  dhc = File.read('/etc/dhcp/dhclient.conf')
+  dhc.sub!(/^\s*send\s*host-name/, '# send host-name')
+  dhc += "\n\n"
+  dhc += "send host-name \"#{hostname}\";\n"
+
+  File.open('/etc/dhcp/dhclient.conf', 'w') do |f|
+    f.write(dhc)
+  end
+end
+
+puts '- Re-obtaining DHCP lease...'
+
+Kernel.system('/etc/init.d/networking restart')
+
+puts '- Cleaning up...'
+File.open('/etc/rc.local', 'w') do |f|
+  f.write("exit 0\n")
+end
+
+puts ''
+puts 'Done!'
