@@ -9,7 +9,7 @@ class packer::vsphere::params {
       $startup_file_source   = 'rc.local'
       $bootstrap_file        = '/etc/vsphere-bootstrap.rb'
       $bootstrap_file_source = 'ubuntu.rb.erb'
-      $ruby_package          = [ 'ruby' ]
+      $ruby_packages          = [ 'ruby', 'ruby-dev', 'zlib1g-dev' ]
       $repo_name             = 'ubuntu'
       $repo_list             = 'main restricted universe multiverse'
       $security_repo_name    = 'ubuntu'
@@ -22,7 +22,7 @@ class packer::vsphere::params {
       $startup_file_source   = 'rc.local'
       $bootstrap_file        = '/etc/vsphere-bootstrap.rb'
       $bootstrap_file_source = 'debian.rb.erb'
-      $ruby_package          = [ 'ruby' ]
+      $ruby_packages          = [ 'ruby', 'ruby-dev', 'zlib1g-dev' ]
       $repo_name             = 'debian'
       $repo_list             = 'main contrib non-free'
       $security_repo_name    = 'debian-security'
@@ -35,7 +35,7 @@ class packer::vsphere::params {
       $startup_file_source   = 'rc.local'
       $bootstrap_file        = '/etc/vsphere-bootstrap.rb'
       $bootstrap_file_source = 'redhat.rb.erb'
-      $ruby_package          = [ 'ruby' ]
+      $ruby_packages          = [ 'ruby' ]
       $gpgkey                = "RPM-GPG-KEY-${::operatingsystem}-${::operatingsystemmajrelease}"
     }
 
@@ -44,7 +44,7 @@ class packer::vsphere::params {
       $startup_file_source   = 'rc.local'
       $bootstrap_file        = '/etc/vsphere-bootstrap.rb'
       $bootstrap_file_source = 'redhat.rb.erb'
-      $ruby_package          = [ 'ruby' ]
+      $ruby_packages          = [ 'ruby' ]
       $gpgkey                = "RPM-GPG-KEY-${::operatingsystemmajrelease}-${loweros}"
     }
 

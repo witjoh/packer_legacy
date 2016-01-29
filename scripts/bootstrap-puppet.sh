@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#### FIXME add puppetca cert to package
+
+# Run a command only if it exists
+if_exists () {
+  command -v $1 >/dev/null && "$@"
+}
+
 case "${TEMPLATE}" in fedora-22*)
   echo "Updating rpcbind..."
   dnf -y upgrade rpcbind
@@ -22,10 +29,10 @@ elif [ -n "${PE_URL}" ]; then
   # Install PE via tarball download if PE_URL set
   echo "Installing PE via tarball..."
 
-  yum install -y wget
+  if_exists yum install -y wget
 
   # Debian 7 in particular won't accept our CA, so we don't verify certificates here
-  wget --no-check-certificate ${PE_URL} -O pe.tar.gz
+  wget --no-verbose --no-check-certificate ${PE_URL} -O pe.tar.gz
 
   cat > /tmp/answers <<EOF
 q_all_in_one_install=n
@@ -51,7 +58,8 @@ EOF
   ./puppet-enterprise-installer -a /tmp/answers
 elif [ -n "${MASTER_INSTALL_URL}" ]; then
   echo "Installing PE from installer on master..."
-  wget --no-check-certificate "${MASTER_INSTALL_URL}" -O- | bash
+  if_exists yum install -y wget
+  wget --no-verbose --no-check-certificate "${MASTER_INSTALL_URL}" -O- | bash
 else
   echo "The environment variables PUPPET_NFS, PE_URL, or MASTER_INSTALL_URL must be provided to provision PE." >&2
   exit 1
@@ -64,9 +72,8 @@ MODULEPATH=/tmp/packer-puppet-masterless/manifests/modules
 printf 'Puppet ' ; puppet --version
 
 # Installed required modules
-for i in "$@"
-do
-  puppet module install $i --modulepath=$MODULEPATH >/dev/null 2>&1
+for module in "$@" ; do
+  puppet module install "$module" --modulepath=$MODULEPATH >/dev/null 2>&1
 done
 
 printf 'Modules installed in ' ; puppet module list --modulepath=$MODULEPATH
