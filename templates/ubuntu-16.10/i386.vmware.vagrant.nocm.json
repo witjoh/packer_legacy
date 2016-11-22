@@ -4,7 +4,7 @@
     {
       "template_name": "ubuntu-16.10-i386",
 
-      "headless": "",
+      "headless": "true",
 
       "provisioner": "vmware",
       "required_modules": "puppetlabs-stdlib saz-sudo",

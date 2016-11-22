@@ -4,7 +4,7 @@
     {
       "template_name": "ubuntu-16.10-i386",
 
-      "headless": "",
+      "headless": "true",
 
       "provisioner": "virtualbox",
       "required_modules": "puppetlabs-apt puppetlabs-stdlib saz-sudo",

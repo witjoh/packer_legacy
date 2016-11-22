@@ -4,7 +4,7 @@
     {
       "template_name": "ubuntu-16.10-x86_64",
 
-      "headless": "",
+      "headless": "true",
 
       "provisioner": "virtualbox",
       "required_modules": "puppetlabs-stdlib saz-sudo",

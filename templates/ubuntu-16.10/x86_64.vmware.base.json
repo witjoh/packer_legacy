@@ -11,7 +11,7 @@
 
       "memory_size": "512",
       "cpu_count": "1",
-      "headless": "",
+      "headless": "true",
 
       "provisioner": "vmware",
       "required_modules": "puppetlabs-stdlib saz-ssh",
