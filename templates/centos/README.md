@@ -33,7 +33,7 @@ all boxes build an come up properly,
 Command to build a box :
 
 ```
-/bin/packer build -var-file=builder.variables.json -var-file=provisioner.variables.json -var-file="i386.centos-6.8.variables.json" -var "iso_url=/data/johan/iso_images/CentOS-6.8-i386-bin-DVD1.iso" libvirt.base.json
+~/bin/packer build -var-file=builder.variables.json -var-file=provisioner.variables.json -var-file="i386.centos-6.8.variables.json" -var "iso_url=/data/johan/iso_images/CentOS-6.8-i386-bin-DVD1.iso" libvirt.base.json
 ~/bin/packer build -var-file=builder.variables.json -var-file=provisioner.variables.json -var-file="i386.centos-6.8.variables.json" libvirt.nocm.json
 ~/bin/packer build -var-file=builder.variables.json -var-file=provisioner.variables.json -var-file="i386.centos-6.8.variables.json" libvirt.puppet.json
 ```
@@ -50,7 +50,7 @@ Command to build a box :
 # TODO
 
 * looking for a proper dir structure ?
-* write decentt docs
+* write decent docs
 * add virtualbox, vmware and more
 * look how to add version 5 (during build, VM does not power recycle properly)
 * ......
