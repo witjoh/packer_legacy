@@ -9,4 +9,7 @@
 
       "puppet_aio": "http://yum.puppetlabs.com/el/6/PC1/x86_64/puppet-agent-1.10.9-1.el6.x86_64.rpm"
 
+      "docker_tag": ":6.9",
+      "docker_image": "centos"
+
     }

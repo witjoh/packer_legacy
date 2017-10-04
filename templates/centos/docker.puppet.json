@@ -5,7 +5,7 @@
     "output_dir": "/opt/output",
     "provisioner": "docker",
     "headless": "true",
-
+    
     "template_name": null,
     "puppet_aio": null,
 
@@ -23,10 +23,11 @@
     "cpu_count": null,
 
     "required_modules": null,
-
-    "docker_registry": "localhost:5000/",
-    "docker_tag": null,
+    "docker_pull_registry": "localhost:5000/",
+    "docker_push_registry": "localhost:5000/",
+    "docker_tag": ":latest",
     "docker_image": null
+
   },
 
   "builders": [
@@ -34,18 +35,24 @@
       "name": "{{user `template_name`}}-{{user `provisioner`}}-vagrant-puppet",
       "type": "docker",
       "commit": true,
-      "image": "{{user `docker_registry`}}{{user `docker_image`}}{{user `docker_tag`}}",
+      "image": "{{user `docker_pull_registry`}}{{user `docker_image`}}{{user `docker_tag`}}",
+      "privileged": true,
       "changes": [
         "LABEL version=0.1",
         "CMD /usr/sbin/init",
         "VOLUME [ '/sys/fs/cgroup' ]",
-        "ONBUILD RUN yum -y update && yum clean all ; echo 'Content removed since running a docker container' > /etc/fstab; systemctl enable sshd;"
+        "ENV init /lib/systemd/systemd",
+        "ONBUILD RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); rm -f /lib/systemd/system/multi-user.target.wants/*; rm -f /etc/systemd/system/*.wants/*; rm -f /lib/systemd/system/local-fs.target.wants/*; rm -f /lib/systemd/system/sockets.target.wants/*udev*; rm -f /lib/systemd/system/sockets.target.wants/*initctl*; rm -f /lib/systemd/system/basic.target.wants/*; rm -f /lib/systemd/system/anaconda.target.wants/*; systemctl enable sshd;"
+
       ]
     }
-      
   ],
 
   "provisioners": [
+    {
+      "type": "shell",
+      "inline": ["yum -y install sudo openssh-server openssh-clients"]
+    },
     {
       "type": "shell",
       "execute_command": "{{.Vars}} sh '{{.Path}}' {{user `required_modules`}}",
@@ -80,12 +87,11 @@
       ]
     }
   ],
-
   "post-processors": [
-    [
+    [ 
       {
         "type": "docker-tag",
-        "repository": "{{user `docker_registry`}}{{user `template_name`}}-puppet",
+        "repository": "{{user `docker_push_registry`}}{{user `template_name`}}-puppet",
         "tag" : "1.0"
       },
       {
@@ -93,4 +99,5 @@
       }
     ]
   ]
+
 }
