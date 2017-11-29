@@ -5,7 +5,7 @@
     "output_dir": "/opt/output",
     "provisioner": "docker",
     "headless": "true",
-    
+
     "template_name": null,
     "puppet_aio": null,
 
@@ -89,7 +89,7 @@
     }
   ],
   "post-processors": [
-    [ 
+    [
       {
         "type": "docker-tag",
         "repository": "{{user `docker_push_registry`}}{{user `template_name`}}-nocm",
